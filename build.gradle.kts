@@ -1,85 +1,38 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.6.21"
-    id("com.diffplug.spotless") version "5.7.0"
-    id("org.springframework.boot") version "2.7.2"
-    id("io.spring.dependency-management") version "1.0.12.RELEASE"
-    id("idea")
-    kotlin("plugin.spring") version "1.6.21"
-    application
+	id("org.springframework.boot") version "3.2.0-RC2"
+	id("io.spring.dependency-management") version "1.1.3"
+	kotlin("jvm") version "1.9.20"
+	kotlin("plugin.spring") version "1.9.20"
 }
 
-group = "com.codely"
-version = "0.0.1"
-java.sourceCompatibility = JavaVersion.VERSION_11
+group = "com.snarlrooter"
+version = "0.0.1-SNAPSHOT"
+
+java {
+	sourceCompatibility = JavaVersion.VERSION_17
+}
 
 repositories {
-    mavenCentral()
-}
-
-sourceSets {
-    create("test-integration") {
-        compileClasspath += sourceSets.main.get().output
-        runtimeClasspath += sourceSets.main.get().output
-    }
-}
-
-val testIntegrationImplementation: Configuration by configurations.getting {
-    extendsFrom(configurations.testImplementation.get())
-}
-
-configurations["testIntegrationRuntimeOnly"].extendsFrom(configurations.testRuntimeOnly.get())
-
-val integrationTest = task<Test>("integrationTest") {
-    description = "Runs integration tests."
-    group = "verification"
-    testClassesDirs = sourceSets["test-integration"].output.classesDirs
-    classpath = sourceSets["test-integration"].runtimeClasspath
-    useJUnitPlatform()
-    shouldRunAfter("test")
+	mavenCentral()
+	maven { url = uri("https://repo.spring.io/milestone") }
 }
 
 dependencies {
-    implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
-    implementation("org.jetbrains.kotlin:kotlin-reflect")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-    implementation("com.diffplug.spotless:spotless-plugin-gradle:6.9.0")
-    implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("org.springframework.boot:spring-boot-starter-actuator")
-
-    testImplementation("org.jetbrains.kotlin:kotlin-test")
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.springframework.boot:spring-boot-test:2.7.2")
-    testImplementation("io.mockk:mockk:1.12.5")
+	implementation("org.springframework.boot:spring-boot-starter-web")
+	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+	implementation("org.jetbrains.kotlin:kotlin-reflect")
+	testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 
 tasks.withType<KotlinCompile> {
-    kotlinOptions {
-        freeCompilerArgs = listOf("-Xjsr305=strict")
-        jvmTarget = "11"
-    }
+	kotlinOptions {
+		freeCompilerArgs += "-Xjsr305=strict"
+		jvmTarget = "17"
+	}
 }
 
 tasks.withType<Test> {
-    useJUnitPlatform()
-}
-
-spotless {
-    kotlin {
-        ktlint()
-            .userData(
-                mapOf(
-                    "insert_final_newline" to "true"
-                )
-            )
-    }
-    kotlinGradle {
-        ktlint()
-    }
-}
-
-tasks.check {
-    dependsOn(integrationTest)
-    dependsOn(tasks.spotlessCheck)
+	useJUnitPlatform()
 }

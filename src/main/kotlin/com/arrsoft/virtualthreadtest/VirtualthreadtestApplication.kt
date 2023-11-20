@@ -1,13 +1,11 @@
-package com.codely.shared
+package com.arrsoft.virtualthreadtest
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
-import org.springframework.context.annotation.ComponentScan
 
 @SpringBootApplication
-@ComponentScan("com.codely")
-class Application
+class VirtualthreadtestApplication
 
 fun main(args: Array<String>) {
-    runApplication<Application>(*args)
+	runApplication<VirtualthreadtestApplication>(*args)
 }
